@@ -8,6 +8,9 @@ import torch
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+def flatten(tensor):
+	return torch.reshape(tensor, (tensor.shape[0], -1,))
+
 class OUNoise:
 	"""Ornstein-Uhlenbeck process."""
 	def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
