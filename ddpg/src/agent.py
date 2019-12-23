@@ -31,7 +31,7 @@ def copy_weights(source_network, target_network):
 
 class DDPG_Agent():
 	#''' DDPG agent '''
-	def __init__(self, state_size, action_size, num_agents, seed, actor_hidden_layers, critic_hidden_layers, use_batch_norm=False, use_noise=False):
+	def __init__(self, state_size, action_size, num_agents, seed, actor_hidden_layers, critic_hidden_layers, use_batch_norm=False):
 		super(DDPG_Agent, self).__init__()
 		
 		self.state_size = state_size
@@ -56,7 +56,7 @@ class DDPG_Agent():
 		
 		# Noise process
 		self.noise = OUNoise((num_agents, action_size), seed)
-		self.use_noise = use_noise
+		
 
 		self.t_step = 0
 
@@ -77,7 +77,7 @@ class DDPG_Agent():
 				experiences = self.memory.sample()
 				self.learn(experiences, GAMMA)
 
-	def act(self, state):
+	def act(self, state, noise_weight):
 		''' Returns actions for a given state as per current policy '''
 		
 		# Make current state into a Tensor that can be passed as input to the network
@@ -94,8 +94,8 @@ class DDPG_Agent():
 		# Put network back into training mode
 		self.actor_local.train()
 		
-		if self.use_noise:
-			action_values += self.noise.sample()
+		
+		action_values += self.noise.sample() * noise_weight
 
 		return np.clip(action_values, -1, 1)
 		
